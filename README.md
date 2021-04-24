@@ -1,4 +1,4 @@
-# project3 encryption example
+# Project-3 encryption example
 Example of storing encrypted password in database and verifying against encrypted password
 
 
