@@ -39,7 +39,7 @@ public class UpdateSecurePassword {
 
         // get the ID and password for each customer
         String query = "SELECT id, password from customers";
-        String query2 = "SELECT id, password from employees";
+        String query2 = "SELECT email, password from employees";
 
         ResultSet rs = statement.executeQuery(query);
         ResultSet rs2 = statement.executeQuery(query2);
