@@ -42,7 +42,6 @@ public class UpdateSecurePassword {
         String query2 = "SELECT email, password from employees";
 
         ResultSet rs = statement.executeQuery(query);
-        ResultSet rs2 = statement.executeQuery(query2);
 
         // we use the StrongPasswordEncryptor from jasypt library (Java Simplified Encryption) 
         //  it internally use SHA-256 algorithm and 10,000 iterations to calculate the encrypted password
@@ -66,6 +65,8 @@ public class UpdateSecurePassword {
         }
         rs.close();
 
+        ResultSet rs2 = statement.executeQuery(query2);
+
         PasswordEncryptor passwordEncryptor2 = new StrongPasswordEncryptor();
 
         ArrayList<String> updateQueryList2 = new ArrayList<>();
@@ -77,7 +78,7 @@ public class UpdateSecurePassword {
             String password = rs2.getString("password");
 
             // encrypt the password using StrongPasswordEncryptor
-            String encryptedPassword2 = passwordEncryptor.encryptPassword(password);
+            String encryptedPassword2 = passwordEncryptor2.encryptPassword(password);
 
             // generate the update query
             String updateQuery = String.format("UPDATE employees SET password='%s' WHERE email='%s';", encryptedPassword2,
