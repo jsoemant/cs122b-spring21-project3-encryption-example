@@ -32,13 +32,17 @@ public class UpdateSecurePassword {
 
         // change the customers table password column from VARCHAR(20) to VARCHAR(128)
         String alterQuery = "ALTER TABLE customers MODIFY COLUMN password VARCHAR(128)";
+        String alterQuery2 = "ALTER TABLE employees MODIFY COLUMN password VARCHAR(128)";
         int alterResult = statement.executeUpdate(alterQuery);
+        int alterResult2 = statement.executeUpdate(alterQuery2);
         System.out.println("altering customers table schema completed, " + alterResult + " rows affected");
 
         // get the ID and password for each customer
         String query = "SELECT id, password from customers";
+        String query2 = "SELECT id, password from employees";
 
         ResultSet rs = statement.executeQuery(query);
+        ResultSet rs2 = statement.executeQuery(query2);
 
         // we use the StrongPasswordEncryptor from jasypt library (Java Simplified Encryption) 
         //  it internally use SHA-256 algorithm and 10,000 iterations to calculate the encrypted password
@@ -62,12 +66,37 @@ public class UpdateSecurePassword {
         }
         rs.close();
 
+        PasswordEncryptor passwordEncryptor2 = new StrongPasswordEncryptor();
+
+        ArrayList<String> updateQueryList2 = new ArrayList<>();
+
+        System.out.println("encrypting password (this might take a while)");
+        while (rs2.next()) {
+            // get the ID and plain text password from current table
+            String email = rs2.getString("email");
+            String password = rs2.getString("password");
+
+            // encrypt the password using StrongPasswordEncryptor
+            String encryptedPassword2 = passwordEncryptor.encryptPassword(password);
+
+            // generate the update query
+            String updateQuery = String.format("UPDATE employees SET password='%s' WHERE email='%s';", encryptedPassword2,
+                    email);
+            updateQueryList2.add(updateQuery);
+        }
+        rs2.close();
+
         // execute the update queries to update the password
         System.out.println("updating password");
         int count = 0;
         for (String updateQuery : updateQueryList) {
             int updateResult = statement.executeUpdate(updateQuery);
             count += updateResult;
+        }
+        int count2 = 0;
+        for (String updateQuery : updateQueryList2) {
+            int updateResult = statement.executeUpdate(updateQuery);
+            count2 += updateResult;
         }
         System.out.println("updating password completed, " + count + " rows affected");
 
